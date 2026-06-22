@@ -9,8 +9,16 @@ export default {
       return json({ error: "Method not allowed" }, 405);
     }
 
-    const contentType = request.headers.get("content-type") ?? "";
+    if (request.headers.get("origin")) {
+      return json({ error: "Browser uploads are not supported" }, 403);
+    }
 
+    const client = request.headers.get("x-client")?.trim();
+    if (!client) {
+      return json({ error: "Missing X-Client header" }, 400);
+    }
+
+    const contentType = request.headers.get("content-type") ?? "";
     const allowedTypes = [
       "application/zip",
       "application/gzip",
@@ -46,7 +54,8 @@ export default {
       customMetadata: {
         uploadedAt: now,
         originalSize: String(body.byteLength),
-        contentType
+        contentType,
+        client
       }
     });
 
