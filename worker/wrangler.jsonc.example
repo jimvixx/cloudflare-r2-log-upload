@@ -1,0 +1,14 @@
+{
+  "name": "log-upload-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-22",
+  "r2_buckets": [
+    {
+      "binding": "LOGS_BUCKET",
+      "bucket_name": "your-r2-bucket-name"
+    }
+  ],
+  "vars": {
+    "MAX_UPLOAD_BYTES": "1048576"
+  }
+}
