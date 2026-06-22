@@ -1,6 +1,5 @@
 export interface Env {
   LOGS_BUCKET: R2Bucket;
-  LOG_UPLOAD_TOKEN: string;
   MAX_UPLOAD_BYTES?: string;
 }
 
@@ -10,9 +9,17 @@ export default {
       return json({ error: "Method not allowed" }, 405);
     }
 
-    const token = request.headers.get("x-upload-token");
-    if (!env.LOG_UPLOAD_TOKEN || token !== env.LOG_UPLOAD_TOKEN) {
-      return json({ error: "Unauthorized" }, 401);
+    const contentType = request.headers.get("content-type") ?? "";
+
+    const allowedTypes = [
+      "application/zip",
+      "application/gzip",
+      "application/x-gzip",
+      "application/octet-stream"
+    ];
+
+    if (!allowedTypes.some(type => contentType.includes(type))) {
+      return json({ error: "Unsupported media type" }, 415);
     }
 
     const maxBytes = Number(env.MAX_UPLOAD_BYTES ?? "1048576");
@@ -34,11 +41,12 @@ export default {
 
     await env.LOGS_BUCKET.put(key, body, {
       httpMetadata: {
-        contentType: request.headers.get("content-type") ?? "application/zip"
+        contentType
       },
       customMetadata: {
         uploadedAt: now,
-        originalSize: String(body.byteLength)
+        originalSize: String(body.byteLength),
+        contentType
       }
     });
 
