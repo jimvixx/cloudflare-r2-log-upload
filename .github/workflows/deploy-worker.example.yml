@@ -43,6 +43,24 @@ jobs:
                 "bucket_name": "${{ vars.CF_R2_BUCKET_NAME }}"
               }
             ],
+            "ratelimits": [
+              {
+                "name": "UPLOAD_IP_RATE_LIMITER",
+                "namespace_id": "${{ vars.CF_RATE_NAMESPACE_IP }}",
+                "simple": {
+                  "limit": ${{ vars.CF_RATE_LIMIT_IP }},
+                  "period": ${{ vars.CF_RATE_LIMIT_PERIOD }}
+                }
+              },
+              {
+                "name": "UPLOAD_GLOBAL_RATE_LIMITER",
+                "namespace_id": "${{ vars.CF_RATE_NAMESPACE_GLOBAL }}",
+                "simple": {
+                  "limit": ${{ vars.CF_RATE_LIMIT_GLOBAL }},
+                  "period": ${{ vars.CF_RATE_LIMIT_PERIOD }}
+                }
+              }
+            ],
             "vars": {
               "MAX_UPLOAD_BYTES": "${{ vars.MAX_UPLOAD_BYTES }}"
             }
